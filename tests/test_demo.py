@@ -10,7 +10,7 @@ try:
     with sync_playwright() as p:
         b = p.chromium.launch(); pg = b.new_page(viewport={'width': 1500, 'height': 900})
         errs = []; pg.on('pageerror', lambda e: errs.append(str(e)))
-        pg.goto(f'http://127.0.0.1:{PORT}/index.html'); pg.wait_for_timeout(4000)
+        pg.goto(f'http://127.0.0.1:{PORT}/both.html'); pg.wait_for_timeout(4000)
         fd = pg.frame(name='ifx-demo:alex@demo.test'); fp = pg.frame(name='ifx-demo:priya@demo.test')
         chk('desktop frame is Alex', fd is not None and 'Alex' in fd.inner_text('body'))
         chk('phone frame is Priya', fp is not None and 'Priya' in fp.inner_text('body'))

@@ -11,8 +11,14 @@ Website = `web/` (plain HTML/JS, host anywhere static, e.g. GitHub Pages). Andro
 
 **No real data, keys or URLs are in this repository.** You bring your own backend.
 
-## Try it first (no setup)--https://squadsplit.github.io/iFiNeX-OSS/
-`bash demo/build-demo.sh` then open `demo/dist/index.html` through any static server (`python3 -m http.server -d demo/dist 8181`). Two fictional users (website + phone) with a realtime event feed. Or enable the *Deploy interactive demo* workflow.
+## Live demo
+<p align="center"><img src="docs/img/demo-choose.png" width="70%" alt="Demo chooser: Website or Mobile app"></p>
+
+After you publish the demo (see `docs/10-LIVE-DEMO.md`, 5 minutes) your repository gets a **Live demo** link at `https://<your-user>.github.io/<repo>/`. Visitors choose **Website** or **Mobile app** (or both side by side); everything uses fictional data in the browser, no backend.
+
+<p align="center"><img src="docs/img/demo-web.png" width="45%" alt="Website demo"> <img src="docs/img/demo-mobile.png" width="45%" alt="Mobile demo"></p>
+
+Run it locally: `bash demo/build-demo.sh` then `python3 -m http.server -d demo/dist 8181` and open http://localhost:8181 .
 
 ## Pick your path
 | I want… | Read |
@@ -25,13 +31,14 @@ Website = `web/` (plain HTML/JS, host anywhere static, e.g. GitHub Pages). Andro
 | Publish the website | `docs/06-GITHUB-PAGES.md` |
 | Build the Android app | `docs/07-ANDROID.md` |
 | Lock it down before real users | `docs/08-SECURITY-CHECKLIST.md` · `docs/09-TRAFFIC-AND-LIMITS.md` |
+| Put a live demo link on my repo page | `docs/10-LIVE-DEMO.md` |
 
 ## Layout
 ```
 web/       website (+ ifinex-config.example.json)
 mobile/    Capacitor Android + iOS projects (mobile/www is a copy of web/, refresh with tools/sync-www.sh)
 supabase/  schema.sql (tables, RLS, functions)  ·  hardening.sql (already included in schema.sql; for upgrading old installs)
-demo/      interactive realtime demo
+demo/      live demo (chooser: website / mobile / both)
 docs/      guides      .github/workflows/  deploy-web · deploy-demo · android-build
 ```
 License: MIT (see LICENSE). Security: see SECURITY.md.
