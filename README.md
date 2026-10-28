@@ -14,7 +14,7 @@ Website = `web/` (plain HTML/JS, host anywhere static, e.g. GitHub Pages). Andro
 ## Live demo
 <p align="center"><img src="docs/img/demo-choose.png" width="70%" alt="Demo chooser: Website or Mobile app"></p>
 
-After you publish the demo (see `docs/10-LIVE-DEMO.md`, 5 minutes) your repository gets a **Live demo** link at `[https://<your-user>.github.io/<repo>/](https://squadsplit.github.io/iFiNeX-Demo/)`. Visitors choose **Website** or **Mobile app** (or both side by side); everything uses fictional data in the browser, no backend.
+After you publish the demo (see `docs/10-LIVE-DEMO.md`, 5 minutes) your repository gets a **Live demo** link at `https://squadsplit.github.io/iFiNeX-Demo/'. Visitors choose **Website** or **Mobile app** (or both side by side); everything uses fictional data in the browser, no backend.
 
 <p align="center"><img src="docs/img/demo-web.png" width="45%" alt="Website demo"> <img src="docs/img/demo-mobile.png" width="45%" alt="Mobile demo"></p>
 
