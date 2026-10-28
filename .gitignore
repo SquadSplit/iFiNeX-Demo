@@ -1,0 +1,11 @@
+node_modules/
+*.jks
+*.keystore
+local.properties
+web/ifinex-config.json
+mobile/www/ifinex-config.json
+demo/dist/
+.env
+*.env
+build/
+.gradle/
