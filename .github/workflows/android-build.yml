@@ -1,0 +1,38 @@
+name: Build Android APK
+# Builds mobile/ into an APK. With the 3 secrets below it is signed with YOUR key; without them you get a debug APK (fine for testing, NOT for updates).
+#   IFX_KEYSTORE_B64 (base64 of your .jks) · IFX_KEYSTORE_PASSWORD · IFX_KEY_ALIAS
+# Config: variables SUPABASE_URL / SUPABASE_ANON_KEY are written into the app like in deploy-web.yml.
+on: { workflow_dispatch: {}, push: { tags: ['v*'] } }
+permissions: { contents: read }
+jobs:
+  apk:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-java@v5
+        with: { distribution: temurin, java-version: '17' }
+      - uses: actions/setup-node@v5
+        with: { node-version: 20 }
+      - name: Config + sync website into the app
+        env: { U: '${{ vars.SUPABASE_URL }}', K: '${{ vars.SUPABASE_ANON_KEY }}' }
+        run: |
+          [ -n "$U" ] && [ -n "$K" ] && printf '{"format":"ifinex-server","version":1,"name":"iFiNeX","site":"","supabaseUrl":"%s","supabaseKey":"%s"}\n' "$U" "$K" > web/ifinex-config.json || true
+          bash tools/sync-www.sh
+      - name: Install + sync Capacitor
+        working-directory: mobile
+        run: npm ci && npx cap sync android
+      - name: Build
+        working-directory: mobile/android
+        env:
+          KS: ${{ secrets.IFX_KEYSTORE_B64 }}
+          IFX_KEYSTORE_PASSWORD: ${{ secrets.IFX_KEYSTORE_PASSWORD }}
+          IFX_KEY_ALIAS: ${{ secrets.IFX_KEY_ALIAS }}
+        run: |
+          chmod +x gradlew
+          if [ -n "$KS" ]; then
+            printf '%s' "$KS" | tr -d ' \r\n\t' | base64 -d > "$RUNNER_TEMP/release.jks"
+            export IFX_KEYSTORE_FILE="$RUNNER_TEMP/release.jks"
+          else export IFX_ALLOW_DEBUG_KEY=1; echo "::warning::No signing secrets - building a DEBUG-signed APK (not updatable)"; fi
+          ./gradlew assembleDebug --no-daemon
+      - uses: actions/upload-artifact@v4
+        with: { name: ifinex-apk, path: 'mobile/android/app/build/outputs/apk/**/*.apk' }

@@ -1,0 +1,20 @@
+name: Deploy interactive demo (GitHub Pages)
+# Builds demo/dist (website + phone side by side, fictional data, in-browser fake backend) and publishes it.
+# Use this INSTEAD of deploy-web.yml if you only want the public demo, or enable both on different repos.
+on:
+  push: { branches: [main], paths: ['demo/**', 'web/**'] }
+  workflow_dispatch:
+permissions: { contents: read, pages: write, id-token: write }
+concurrency: { group: pages-demo, cancel-in-progress: true }
+jobs:
+  deploy:
+    runs-on: ubuntu-24.04
+    environment: { name: github-pages, url: '${{ steps.d.outputs.page_url }}' }
+    steps:
+      - uses: actions/checkout@v5
+      - run: bash demo/build-demo.sh
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with: { path: demo/dist }
+      - id: d
+        uses: actions/deploy-pages@v4

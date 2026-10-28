@@ -1,0 +1,26 @@
+name: Deploy website (GitHub Pages)
+# Publishes ./web to GitHub Pages. Your Supabase URL + anon key come from repository VARIABLES (Settings > Secrets and variables > Actions > Variables):
+#   SUPABASE_URL, SUPABASE_ANON_KEY   (both are public values - the anon key is meant to be public)
+# If the variables are empty the site opens in standalone / "choose a server" mode.
+on:
+  push: { branches: [main], paths: ['web/**'] }
+  workflow_dispatch:
+permissions: { contents: read, pages: write, id-token: write }
+concurrency: { group: pages, cancel-in-progress: true }
+jobs:
+  deploy:
+    runs-on: ubuntu-24.04
+    environment: { name: github-pages, url: '${{ steps.d.outputs.page_url }}' }
+    steps:
+      - uses: actions/checkout@v5
+      - name: Write ifinex-config.json from repository variables
+        env: { U: '${{ vars.SUPABASE_URL }}', K: '${{ vars.SUPABASE_ANON_KEY }}' }
+        run: |
+          if [ -n "$U" ] && [ -n "$K" ]; then
+            printf '{"format":"ifinex-server","version":1,"name":"iFiNeX","site":"","supabaseUrl":"%s","supabaseKey":"%s"}\n' "$U" "$K" > web/ifinex-config.json
+          else echo "No SUPABASE_URL/SUPABASE_ANON_KEY variables -> standalone mode"; fi
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with: { path: web }
+      - id: d
+        uses: actions/deploy-pages@v4
