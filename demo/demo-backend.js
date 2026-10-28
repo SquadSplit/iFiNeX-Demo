@@ -30,8 +30,23 @@
         et_categories: [], bp_income: [], bp_items: [], bp_goals: [],
         members_config: [
           { id: 'alex', name: 'Alex', emoji: '😎', color: '#4d96ff', is_admin: true, email: 'alex@demo.test', sort_order: 1 },
-          { id: 'priya', name: 'Priya', emoji: '👩', color: '#ff92d0', is_admin: false, email: 'priya@demo.test', sort_order: 2 }],
-        expenses: [], prev_balances: [], settlements: []
+          { id: 'priya', name: 'Priya', emoji: '👩', color: '#ff92d0', is_admin: false, email: 'priya@demo.test', sort_order: 2 },
+          { id: 'mia', name: 'Mia', emoji: '🧑‍🎨', color: '#ffb84d', is_admin: false, email: '', sort_order: 3 },
+          { id: 'omar', name: 'Omar', emoji: '🧔', color: '#7bd88f', is_admin: false, email: '', sort_order: 4 }],
+        squads: [
+          { id: 1, name: 'Weekend Trip', emoji: '🏖️', color: '#4d96ff', sort_order: 1, is_archived: false, created_by: 'alex@demo.test', created_at: now() },
+          { id: 2, name: 'Flat 12', emoji: '🏠', color: '#ff92d0', sort_order: 2, is_archived: false, created_by: 'alex@demo.test', created_at: now() }],
+        squad_members: [
+          { id: 1, squad_id: 1, member_id: 'alex', sort_order: 1 }, { id: 2, squad_id: 1, member_id: 'priya', sort_order: 2 },
+          { id: 3, squad_id: 1, member_id: 'mia', sort_order: 3 }, { id: 4, squad_id: 1, member_id: 'omar', sort_order: 4 },
+          { id: 5, squad_id: 2, member_id: 'alex', sort_order: 1 }, { id: 6, squad_id: 2, member_id: 'priya', sort_order: 2 }],
+        expenses: [
+          { id: 1, squad_id: 1, name: 'Fuel', amount: 60, paid_by: 'alex', split_between: ['alex', 'priya', 'mia', 'omar'], date: d(3), category: 'fuel', month: m, created_at: now() },
+          { id: 2, squad_id: 1, name: 'BBQ dinner', amount: 96, paid_by: 'priya', split_between: ['alex', 'priya', 'mia', 'omar'], date: d(4), category: 'food', month: m, created_at: now() },
+          { id: 3, squad_id: 1, name: 'Cabin rental', amount: 240, paid_by: 'mia', split_between: ['alex', 'priya', 'mia', 'omar'], date: d(4), category: 'stay', month: m, created_at: now() },
+          { id: 4, squad_id: 2, name: 'Internet', amount: 40, paid_by: 'alex', split_between: ['alex', 'priya'], date: d(2), category: 'bills', month: m, created_at: now() },
+          { id: 5, squad_id: 2, name: 'Groceries', amount: 72, paid_by: 'priya', split_between: ['alex', 'priya'], date: d(6), category: 'food', month: m, created_at: now() }],
+        prev_balances: [], settlements: []
       }
     };
     TOP.__IFX_DEMO.db.app_users_directory = TOP.__IFX_DEMO.db.app_users;
@@ -115,6 +130,21 @@
       if (other) notify(eqs(row.user_email, me) ? other.email : row.user_email, 'Entry deleted', nameOf(me) + ' deleted an entry: ' + (a.p_reason || ''));
       return { data: { ok: true }, error: null };
     }
+    if (fn === 'squad_save') {            // stands in for the admin RPC of the real database (multi-squad, v9.3)
+      var ids = a.p_members || [], sid = a.p_id;
+      if (!sid) { sid = ++S.seq; DB.squads.push({ id: sid, name: a.p_name, emoji: a.p_emoji || '👥', color: a.p_color || '#4d96ff', sort_order: DB.squads.length + 1, is_archived: false, created_by: me, created_at: now() }); }
+      else { var sq = DB.squads.find(function (x) { return x.id === sid; }); if (sq) { sq.name = a.p_name; sq.emoji = a.p_emoji || sq.emoji; sq.color = a.p_color || sq.color; } }
+      DB.squad_members = DB.squad_members.filter(function (r) { return r.squad_id !== sid; });
+      ids.forEach(function (mid, i) { DB.squad_members.push({ id: ++S.seq, squad_id: sid, member_id: mid, sort_order: i + 1 }); });
+      emit('UPDATE', 'squads', { id: sid });
+      return { data: sid, error: null };
+    }
+    if (fn === 'squad_add_person') {
+      var pid = String(a.p_name || 'p').toLowerCase().replace(/[^a-z0-9]/g, '') + (++S.seq);
+      DB.members_config.push({ id: pid, name: a.p_name, emoji: a.p_emoji || '🙂', color: a.p_color || '#7bd88f', is_admin: false, email: a.p_email || '', sort_order: DB.members_config.length + 1 });
+      return { data: pid, error: null };
+    }
+    if (fn === 'squad_set_archived') { var q2 = DB.squads.find(function (x) { return x.id === a.p_id; }); if (q2) q2.is_archived = !!a.p_archived; return { data: null, error: null }; }
     if (fn === 'register_device' || fn === 'unregister_device') return { data: { ok: true }, error: null };
     return { data: { ok: true, inserted: 0, skipped: 0, failed: 0 }, error: null };
   }

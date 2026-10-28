@@ -7,5 +7,5 @@ cp -r "$WEB"/. "$OUT/app/"
 cp "$HERE/demo-backend.js" "$OUT/app/vendor/supabase.js"          # the real client is replaced by the in-browser fake
 rm -f "$OUT/app/vendor/ifinex-local.js" 2>/dev/null || true
 printf '{"format":"ifinex-server","version":1,"name":"iFiNeX DEMO","site":"","supabaseUrl":"https://demo.example.invalid","supabaseKey":"demo-not-a-real-key"}\n' > "$OUT/app/ifinex-config.json"
-cp "$HERE/index.html" "$OUT/index.html"; touch "$OUT/.nojekyll"
+cp "$HERE"/*.html "$HERE/shared.css" "$HERE/viewer.js" "$OUT/"; touch "$OUT/.nojekyll"
 echo "demo built: $OUT"

@@ -1,40 +1,24 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>iFiNeX Live Demo</title>
+<title>iFiNeX Live Demo</title><link rel="stylesheet" href="shared.css">
 <style>
-:root{--bg:#0b0b18;--card:#14142a;--tx:#e8eaff;--mut:#9aa3c7;--ac:#4d96ff}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--tx);font:14px system-ui,sans-serif}
-header{padding:14px 20px;border-bottom:1px solid #26264a}h1{margin:0;font-size:18px}header p{margin:4px 0 0;color:var(--mut)}
-main{display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:16px;padding:16px}
-.frames{display:flex;gap:16px;flex-wrap:wrap;align-items:flex-start}
-.fr{background:var(--card);border-radius:14px;padding:10px}.fr h2{margin:0 0 8px;font-size:13px;color:var(--mut)}
-iframe{border:0;background:#fff;border-radius:8px;display:block}#fd{width:760px;height:620px;max-width:100%}#fp{width:360px;height:620px}
-aside{display:flex;flex-direction:column;gap:12px}.box{background:var(--card);border-radius:14px;padding:12px}
-.box h3{margin:0 0 8px;font-size:13px}ol{margin:0;padding-left:18px;color:var(--mut)}li{margin:6px 0}li b{color:var(--tx)}
-button{background:var(--ac);color:#fff;border:0;border-radius:8px;padding:6px 10px;margin-top:4px;cursor:pointer}
-#feed{max-height:230px;overflow:auto;font:12px ui-monospace,monospace;color:var(--mut)}#feed div{padding:3px 0;border-bottom:1px solid #22224a}
-.note{color:var(--mut);font-size:12px}@media(max-width:1200px){main{grid-template-columns:1fr}}
-</style></head><body>
-<header><h1>iFiNeX — interactive realtime demo</h1><p>Fictional users and fake data. Nothing leaves your browser. Left = website (Alex, admin) · right = phone app (Priya). Change something on one side and watch the other update.</p></header>
-<main><div class="frames">
- <div class="fr"><h2>🖥 Website — Alex (admin)</h2><iframe id="fd" name="ifx-demo:alex@demo.test" src="app/bill-tracker.html" title="website"></iframe></div>
- <div class="fr"><h2>📱 Mobile app — Priya</h2><iframe id="fp" name="ifx-demo:priya@demo.test" src="app/bill-tracker.html" title="phone"></iframe></div>
+main{max-width:860px;margin:0 auto;padding:34px 16px 40px;text-align:center}
+h1{font-size:28px;margin:0 0 6px}.lead{color:var(--mut);margin:0 auto 26px;max-width:560px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.opt{display:block;text-decoration:none;background:var(--card);border:1px solid var(--ln);border-radius:18px;padding:26px 18px;transition:.15s}
+.opt:hover,.opt:focus-visible{border-color:var(--ac);transform:translateY(-2px);outline:0}
+.opt .ic{font-size:46px}.opt h2{margin:8px 0 4px;font-size:20px}.opt p{margin:0;color:var(--mut)}
+.opt .go{display:inline-block;margin-top:14px;background:var(--ac);color:#fff;border-radius:10px;padding:8px 16px;font-weight:600}
+.both{display:block;margin-top:16px;color:var(--mut);text-decoration:none;border:1px dashed var(--ln);border-radius:14px;padding:12px}
+.both:hover{border-color:var(--ac);color:var(--tx)}
+.foot{margin-top:22px}
+@media(max-width:600px){.grid{grid-template-columns:1fr}h1{font-size:23px}}
+</style></head><body><main>
+<h1>Try iFiNeX live</h1>
+<p class="lead">Pick how you want to experience it. Everything uses fictional people and fake data and runs only in your browser — nothing is saved or sent anywhere.</p>
+<div class="grid">
+ <a class="opt" href="web.html"><div class="ic">🖥️</div><h2>Website</h2><p>The full web app on a desktop-size screen. You are <b>Alex</b>, the admin.</p><span class="go">Open website demo →</span></a>
+ <a class="opt" href="mobile.html"><div class="ic">📱</div><h2>Mobile app</h2><p>The Android app experience in a phone frame. You are <b>Priya</b>, a member.</p><span class="go">Open mobile demo →</span></a>
 </div>
-<aside>
- <div class="box"><h3>Guided workflow — click a step, then look at the other screen</h3><ol>
-  <li><b>Priya records an owe entry</b> (what she owes Alex)<br><button id="s1">Run as Priya</button></li>
-  <li><b>Alex adds an expense</b> on his card<br><button id="s2">Run as Alex</button></li>
-  <li><b>Alex deletes Priya's entry with a reason</b> — Priya is notified at once<br><button id="s3">Run as Alex</button></li>
-  <li><b>Try it yourself</b>: open a card, add an expense, check the 🔔 bell on the other screen.</li></ol></div>
- <div class="box"><h3>Realtime activity feed (database events)</h3><div id="feed"></div></div>
- <div class="box note">Demo data is rebuilt every time you reload this page. This is the real website code with an in-browser fake backend — the production app talks to your own Supabase project. Self-host guide: see the repository README.</div>
-</aside></main>
-<script>
-var feed=document.getElementById('feed');
-function line(t){var d=document.createElement('div');d.textContent=t;feed.prepend(d);}
-window.addEventListener('ifx-demo-event',function(e){var x=e.detail;line(new Date().toLocaleTimeString()+'  '+x.ev+' '+x.table+'  by '+x.by.split('@')[0]);});
-function sbOf(id){var w=document.getElementById(id).contentWindow;return w.supabase.createClient();}
-function mon(){return new Date().toISOString().slice(0,7);}
-document.getElementById('s1').onclick=function(){sbOf('fp').from('bill_owed').insert({user_email:'priya@demo.test',amount:30,note:'Taxi share (guided demo)',month:mon()});};
-document.getElementById('s2').onclick=function(){sbOf('fd').from('bill_expenses').insert({user_email:'alex@demo.test',description:'Coffee (guided demo)',amount:12.5,card_id:1,category:'food',date:new Date().toISOString().slice(0,10),month:mon()});};
-document.getElementById('s3').onclick=function(){var c=sbOf('fd');c.rpc('delete_owed_entry',{p_id:1,p_reason:'Duplicate of the cinema bill'});};
-</script></body></html>
+<a class="both" href="both.html">↔ Want to see both at once? <b>Website + phone side by side</b> with a realtime activity feed</a>
+<p class="note foot">Includes Bill Tracker, Expense Tracker, Budget planner and multi-squad Squad Split. The real app connects to your own Supabase database; this demo uses an in-browser stand-in.</p>
+</main></body></html>

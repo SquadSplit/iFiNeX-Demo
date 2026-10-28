@@ -1,0 +1,16 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>iFiNeX Demo · Mobile app</title><link rel="stylesheet" href="shared.css">
+<style>body{display:flex;flex-direction:column}
+#box{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;padding:14px}
+.phone{background:#000;border-radius:38px;padding:12px;border:2px solid #34345e;box-shadow:0 20px 60px #0008}
+.phone iframe{border-radius:28px;width:390px;height:min(800px,calc(100vh - 150px));min-height:520px}
+@media(max-width:480px){#box{padding:0}.phone{border:0;border-radius:0;padding:0;box-shadow:none;width:100%;height:100%}.phone iframe{width:100%;height:100%;border-radius:0}}
+</style></head><body>
+<div class="bar"><a class="back" href="index.html">← Choose again</a><b>📱 Mobile app demo</b><span class="sp"></span>
+ <span class="seg" id="mod" role="group" aria-label="Module"><button data-v="bill-tracker.html">Bill Tracker &amp; more</button><button data-v="squad.html">Squad Split</button></span>
+ <span class="seg" id="usr" role="group" aria-label="User"><button data-v="alex">Alex · admin</button><button data-v="priya">Priya · member</button></span>
+ <span class="seg"><button id="rst" title="Reset the fake data">↺ Reset</button></span></div>
+<div id="box"></div>
+<script>window.IFX_VIEW={user:'priya',title:'iFiNeX mobile app demo',frameStyle:''};
+/* wrap the iframe in a phone body (viewer.js builds it into #box) */
+(function(){var b=document.getElementById('box'),o=b.appendChild.bind(b);b.appendChild=function(f){var p=document.createElement('div');p.className='phone';p.appendChild(f);return o(p);};})();</script><script src="viewer.js"></script></body></html>
