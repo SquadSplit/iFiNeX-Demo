@@ -1,0 +1,4 @@
+IMPORTANT FOR FORKS
+- This package contains NO live database address, NO keys, NO e-mail of the owner.
+- Your site connects to a database ONLY when you put your own ifinex-config.json next to the pages.
+- Test your fork in a private/incognito window, or on a different address than any site you already use.

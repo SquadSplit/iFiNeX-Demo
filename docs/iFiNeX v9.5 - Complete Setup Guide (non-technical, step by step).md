@@ -27,7 +27,7 @@ select vault.update_secret(
 4. Make yourself the first admin: run `SELF-HOST - first admin (run after FULL no data).sql` from the `sql` folder of the complete project (edit your email in it first).
 5. Copy your project's address and key: Settings → API → **Project URL** and **anon / publishable key**. You need them in Part 3.
 ### 2B. Cloning WITH your data
-1. On the OLD (live) project run **`6 EXPORT - run on live DB to get a with-data clone script.sql`**. You get one cell named `restore_script`. Click it → copy everything → save as `restore_data.sql`.
+1. On the OLD (live) project run **`6 EXPORT - run on live DB to get a with-data clone script.sql`**. You get one cell named `restore_script`. Click the cell and use **Copy** (not Export/Download as markdown or CSV: those corrupt the file) → paste into Notepad → save as `restore_data.sql`.
 2. On the NEW project do 2A first, then paste `restore_data.sql` → Run. (People reconnect Google Drive and re-enable phone alerts after a clone; device and Drive secrets are deliberately not copied.)
 ### 2C. Your EXISTING live project (already running) — only run what is missing
 Already applied: Pack A, multi-squad, Google Drive part 1 and 2. **Now run: `5 IO FIX - reduce database writes.sql`** (stops the Supabase "Disk IO Budget" warning). Still pending: Pack B (needs a new `CRON_SECRET`; ask Claude to prepare it).

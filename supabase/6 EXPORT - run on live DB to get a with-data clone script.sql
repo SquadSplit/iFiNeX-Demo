@@ -1,5 +1,6 @@
 -- iFiNeX v9.5  EXPORT YOUR LIVE DATA AS A RESTORE SCRIPT  (paste in Supabase > SQL Editor > Run on the LIVE project).
--- Result = ONE cell called restore_script. Click the cell > copy all > save as "restore_data.sql".
+-- Result = ONE cell called restore_script. Click the cell > use COPY (copy the cell text) > paste into a text editor > save as restore_data.sql.
+-- DO NOT use Export / Download as markdown or CSV: it adds table characters, turns line breaks into <br> and doubles backslashes (corrupts notifications).
 -- To clone: run the FULL (no data) script on the new project, THEN paste restore_data.sql there and Run.
 -- Always matches live data at the moment you run it (a typed snapshot would be out of date). Changes nothing.
 -- Left out on purpose (secrets / device-specific, they re-create themselves): bill_devices, bill_push_subscriptions,
