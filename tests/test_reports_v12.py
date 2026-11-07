@@ -16,7 +16,7 @@ try:
   pg.goto(f'http://127.0.0.1:{PORT}/tests/ledger_harness.html');pg.wait_for_timeout(500)
   pg.evaluate("ifxReports.open('bill')");pg.wait_for_timeout(1200)
   txt=pg.inner_text('#ifx-rep').lower()
-  chk('UI: 4 steps + report types',all(x in txt for x in ['1 · duration','2 · modules','3 · users','4 · report type','balances only','full breakdown','weekly','monthly','all time','custom dates']))
+  chk('UI: 5 steps + report type boxes',all(x in txt for x in ['1 · duration','2 · modules','3 · users','4 · with whom','5 · report type','balances','full breakdown','weekly','monthly','all time','custom dates','everyone','choose people']))
   chk('UI: old Layout/Include sections are gone','layout' not in txt and 'include' not in txt)
   ALL={'squad':True,'bill':True,'plan':True,'et':False,'bp':False}
   # ===== synthetic ledger, user Alice, all time =====
@@ -27,7 +27,7 @@ try:
   chk('matrix rows are modules',[r[0] for r in mx['rows']][:3]==['Squad Split','Bill Tracker — owed to admin','EPP & Gold plans'])
   ow=[t for t in ts if t['title'].startswith('WHO PAYS YOU')][0]; chk('Cara owes Alice 10 net (party -30, plan +40)',ow['total'][1]==10 and ow['head'][1]=='From Cara')
   last=ts[[i for i,t in enumerate(ts) if t['title']=='GRAND TOTAL'][0]]
-  chk('GRAND TOTAL: pays listed, Alice needs to pay 510 then net 500 (after Cara 10)',last['total'][1]==500 and any(r[0]=='Alice needs to pay — TOTAL' and r[1]==510 for r in last['rows']))
+  chk('GRAND TOTAL: owed to Alice 10, Alice owes 510 (separate lines), NET 500 last',last['total'][1]==500 and any(r[0].startswith('TOTAL ALICE OWES') and r[1]==510 for r in last['rows']) and any(r[0].startswith('TOTAL OWED TO ALICE') and r[1]==10 for r in last['rows']))
   gi=[i for i,t in enumerate(ts) if t['title']=='GRAND TOTAL'][0]; chk('GRAND TOTAL is the last statement table before extras',all(not t['title'].startswith(('WHO','PAID')) for t in ts[gi+1:]))
   bob=[t for t in ts if '⇄ Bob' in t['title']][0]; print(bob['rows'])
   months=[r[0] for r in bob['rows']]; chk('months newest first (Mar, Feb, Jan)',months[0].startswith('Mar') and months[-1].startswith('Jan'))
@@ -60,6 +60,15 @@ try:
   ta=pg.evaluate(BUILD,{'s':{'dur':'all','scope':'all','mode':'bal'},'mods':ALL})
   oa=[t for t in ta if t['title'].startswith('Abdullah — WHO PAYS YOU')][0]; print(oa['head'],oa['total'])
   chk('REAL CASE admin: owed by Kaatuva 1826.88, Naina 1478.10, Niyaz 320.27, Bidni 273.18 = 3898.43',oa['total'][1:]==[1826.88,1478.1,320.27,273.18,3898.43])
+  gtot=[t for t in ta if t['title']=='Abdullah — GRAND TOTAL'][0]; print(gtot['rows'],gtot['total'])
+  chk('REAL CASE grand total: others owe Abdullah 3898.43 (not net of anything), no payables -> that is the last line',gtot['total'][1]==3898.43 and len(gtot['rows'])==4)
+  tw2=pg.evaluate(BUILD,{'s':{'dur':'all','scope':'all','mode':'bal','withAll':False,'withPick':{'k@x.com':True,'n@x.com':True}},'mods':ALL})
+  ow2=[t for t in tw2 if t['title'].startswith('Abdullah — WHO PAYS YOU')][0]; chk('choose people: only Kaatuva + Naina -> 1826.88 + 1478.10 = 3304.98',ow2['head'][1:3]==['From Kaatuva','From Naina'] and ow2['total'][-1]==3304.98 and len(ow2['head'])==4)
+  chk('choose people: only their blocks',all(any(n in t['title'] for n in ('Kaatuva','Naina')) for t in tw2 if '⇄' in t['title']))
+  tw3=pg.evaluate(BUILD,{'s':{'dur':'all','scope':'all','mode':'bal','withAll':False,'withPick':{'k@x.com':True},'dirRecv':False},'mods':ALL}); chk('direction: "they owe me" unticked removes Kaatuva',not any(t['title'].startswith('Abdullah — WHO PAYS YOU') for t in tw3))
+  pg.evaluate("(()=>{var s=ifxReports._state();s.withAll=true;s.withPick={};s.dirRecv=true;s.dirPay=true;s.mode='bal'})()")
+  tdet=pg.evaluate(BUILD,{'s':{'dur':'all','scope':'all','mode':'det'},'mods':ALL}); chk('breakdown only: entries but no month-by-month',any('every entry' in t['title'] for t in tdet) and not any('month by month' in t['title'] for t in tdet))
+  tboth=pg.evaluate(BUILD,{'s':{'dur':'all','scope':'all','mode':'full'},'mods':ALL}); chk('both ticked: month-by-month + entries',any('every entry' in t['title'] for t in tboth) and any('month by month' in t['title'] for t in tboth))
   # downloads
   pg.goto(f'http://127.0.0.1:{PORT}/tests/ledger_harness.html?as=d@x.com');pg.wait_for_timeout(400);pg.evaluate("ifxReports.open('all')");pg.wait_for_timeout(1000)
   pg.evaluate("ifxReports._state().scope='all'")

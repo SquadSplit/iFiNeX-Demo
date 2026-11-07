@@ -61,6 +61,13 @@ Mark as completed / Reopen / Edit / Delete (⋯ menu) and an Active · Completed
 ## Versioning
 Major number = a release with new features (web 10, app 3, …). Minor number = small fixes only. v10.0 / app 3.0.0 contains everything from v9.8–v9.10: Completed lifecycle + filters, faster saving, Report Center + working downloads, in-app updater.
 
+## What's new in v13.0 (web 13.0 / app 6.0.0) — choose who, direction and report type
+* **With whom:** pick Everyone or tick specific people (e.g. only Kaatuva, or Kaatuva + Naina) for the statement of the chosen account(s).
+* **Direction:** tick "what they owe the account" and/or "what the account owes them".
+* **Report type is now two checkboxes:** Balances and/or Full breakdown (breakdown alone is allowed).
+* **Grand total is clearer:** "TOTAL OWED TO <you>" and "TOTAL <you> OWES" are separate lines; the NET only appears when both exist. Example: others owe Abdullah 3,898.43 — it is no longer silently reduced by what he owes someone else.
+* Mobile layout: long TOTAL labels span the table instead of wrapping in one narrow cell.
+
 ## What's new in v12.2 (web 12.2 / app 5.1.1) — correct, readable statement
 * **Squad Split now matches the Squad page** (all expenses + carried balances − settlements, then the same "simplify" netting). Before, the report only looked inside single months and showed 0 for someone who owes 547.
 * **Who pays whom:** one column per person ("To pay Abdullah", "To pay Naina" …), one row per module, TOTAL TO PAY.
