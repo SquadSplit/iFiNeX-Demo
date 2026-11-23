@@ -1,0 +1,8 @@
+{
+  "format": "ifinex-server",
+  "version": 1,
+  "name": "My iFiNeX",
+  "site": "https://YOUR_USER.github.io/ifinex-web",
+  "supabaseUrl": "https://YOUR-PROJECT-REF.supabase.co",
+  "supabaseKey": "YOUR-SUPABASE-ANON-OR-PUBLISHABLE-KEY"
+}
