@@ -1,0 +1,27 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex">
+<title>Simulated Google sign-in · iFiNeX demo</title>
+<style>
+body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;background:#f1f3f4;color:#202124;font:14px/1.5 system-ui,Roboto,Arial,sans-serif;padding:14px;box-sizing:border-box}
+.c{max-width:420px;width:100%;background:#fff;border:1px solid #dadce0;border-radius:12px;padding:26px 24px}
+.sim{background:#fff3cd;border:1px solid #e0c36a;border-radius:8px;padding:8px 10px;font-size:12px;margin-bottom:16px;color:#5b4a00}
+h1{font-size:20px;font-weight:500;margin:0 0 4px}p{color:#5f6368;margin:6px 0}
+.acc{display:flex;gap:12px;align-items:center;padding:10px;border:1px solid #dadce0;border-radius:8px;margin:12px 0;background:#fafafa}
+.av{width:36px;height:36px;border-radius:50%;background:#1a73e8;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:600}
+ul{padding-left:18px;color:#3c4043}.b{display:flex;gap:10px;margin-top:18px;justify-content:flex-end}
+button{border:0;border-radius:6px;padding:9px 18px;font:inherit;font-weight:500;cursor:pointer}#ok{background:#1a73e8;color:#fff}#no{background:transparent;color:#1a73e8}
+</style></head><body><div class="c">
+<div class="sim"><b>This is NOT Google.</b> It is a picture of the step you would see on Google's own page. The real app opens accounts.google.com — here nothing leaves your browser and no account is used.</div>
+<h1>Choose an account</h1><p>to continue to <b>iFiNeX</b></p>
+<div class="acc"><div class="av">D</div><div><b>Demo User</b><br><span id="em"></span></div></div>
+<p><b>iFiNeX wants to:</b></p><ul><li>See your email address</li><li>See, create and delete only its own <b>hidden app-data folder</b> in your Google Drive (scope <code>drive.appdata</code>) — it cannot see your other files</li></ul>
+<div class="b"><button id="no">Cancel</button><button id="ok">Allow</button></div></div>
+<script>
+(function(){
+  var q=new URLSearchParams(location.search),back=q.get('return')||'index.html',nm=String(window.name||''),me=(nm.match(/^ifx-demo:(.+)$/)||[])[1]||'alex@demo.test';
+  var S=window.top.__IFX_DEMO||{gd:{links:{},settings:{}}};
+  document.getElementById('em').textContent=me.replace('@demo.test','')+'.demo@gmail.example';
+  function go(code){var u=new URL(back,location.href);u.searchParams.set('gdrive',code);location.href=u.href;}
+  document.getElementById('ok').onclick=function(){S.gd.links[me]={google_email:me.replace('@demo.test','')+'.demo@gmail.example',at:new Date().toISOString()};go('ok');};
+  document.getElementById('no').onclick=function(){go('err_denied');};
+})();
+</script></body></html>

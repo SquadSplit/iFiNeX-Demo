@@ -1,0 +1,123 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>iFiNeX — live demo &amp; full feature guide</title>
+<meta name="description" content="Try iFiNeX in your browser — website or mobile app — with guided walkthroughs, a request inspector, and a searchable guide to every option and function.">
+<link rel="stylesheet" href="shared.css">
+<style>
+html{scroll-behavior:smooth}body{height:auto}
+nav.top{position:sticky;top:0;z-index:5;background:#0b0b18ee;backdrop-filter:blur(8px);border-bottom:1px solid var(--ln);display:flex;gap:4px;overflow:auto;padding:8px 12px;align-items:center}
+nav.top b{margin-right:10px;white-space:nowrap}nav.top a{color:var(--mut);text-decoration:none;padding:6px 10px;border-radius:8px;white-space:nowrap;font-size:13px}nav.top a:hover{background:#1b1b38;color:var(--tx)}
+section{max-width:1060px;margin:0 auto;padding:44px 16px 8px}h2{font-size:24px;margin:0 0 6px}h2+p.lead{margin:0 0 20px}
+.lead{color:var(--mut);max-width:760px}
+.hero{text-align:center;padding-top:44px}.hero h1{font-size:36px;margin:0 0 8px;line-height:1.15}.hero .lead{margin:0 auto 22px}
+.grid{display:grid;gap:14px}.g2{grid-template-columns:repeat(2,1fr)}.g3{grid-template-columns:repeat(3,1fr)}.g4{grid-template-columns:repeat(4,1fr)}
+.card{background:var(--card);border:1px solid var(--ln);border-radius:16px;padding:16px}.card h3{margin:0 0 6px;font-size:16px}.card p{margin:0;color:#c3caef}
+a.opt{display:block;text-decoration:none;background:var(--card);border:1px solid var(--ln);border-radius:18px;padding:24px 16px;transition:.15s;text-align:center}
+a.opt:hover,a.opt:focus-visible{border-color:var(--ac);transform:translateY(-2px);outline:0}a.opt .ic{font-size:44px}a.opt h3{margin:6px 0 4px;font-size:20px}a.opt p{margin:0;color:var(--mut)}
+.go{display:inline-block;margin-top:12px;background:var(--ac);color:#fff;border-radius:10px;padding:8px 16px;font-weight:600}
+.both{display:block;margin:14px auto 0;max-width:560px;text-decoration:none;color:var(--mut);border:1px dashed var(--ln);border-radius:14px;padding:11px}.both:hover{border-color:var(--ac);color:var(--tx)}
+.stat{text-align:center}.stat b{display:block;font-size:28px;color:var(--ac)}.stat span{color:var(--mut);font-size:12px}
+.pill{display:inline-block;font-size:11px;padding:2px 9px;border-radius:20px;border:1px solid var(--ln);color:var(--mut);margin:2px 4px 2px 0}
+.ok{color:#7bd88f;border-color:#2f6b43}.sim{color:#ffd86b;border-color:#7a6320}.dsc{color:#9fb4ff;border-color:#34457a}
+.note{background:#1a1730;border:1px solid #3d3470;border-radius:14px;padding:14px;color:#d6d0ff}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0}.chip{background:var(--card);border:1px solid var(--ln);color:var(--mut);border-radius:20px;padding:5px 12px;cursor:pointer;font:inherit;font-size:13px}.chip[aria-pressed=true]{background:var(--ac);border-color:var(--ac);color:#fff}
+input.q{width:100%;background:var(--card);border:1px solid var(--ln);color:var(--tx);border-radius:12px;padding:12px 14px;font:inherit;font-size:15px}
+.f{background:var(--card);border:1px solid var(--ln);border-radius:14px;margin:8px 0}.f>summary{cursor:pointer;padding:12px 14px;list-style:none;display:flex;gap:8px;align-items:center;flex-wrap:wrap}.f>summary::-webkit-details-marker{display:none}
+.f>summary b{flex:1;min-width:200px}.f .body{padding:0 14px 14px;color:#c9d0f5}.f .body h4{margin:12px 0 4px;font-size:12px;color:var(--mut);text-transform:uppercase;letter-spacing:.06em}.f ul{margin:4px 0;padding-left:18px}
+code{background:#08081a;border:1px solid #22224a;border-radius:6px;padding:1px 6px;font-size:12px;color:#cdd6ff}
+table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--ln);vertical-align:top;font-size:13px}th{color:var(--mut);font-weight:600}
+.tw{overflow:auto;border:1px solid var(--ln);border-radius:14px;background:var(--card)}
+.scn{display:flex;gap:10px;align-items:flex-start;text-decoration:none;background:var(--card);border:1px solid var(--ln);border-radius:14px;padding:12px}.scn:hover{border-color:var(--ac)}.scn .i{font-size:24px}.scn b{display:block}.scn span{color:var(--mut);font-size:12px}
+.flow{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:8px 0}.flow span{background:#0f0f22;border:1px solid var(--ln);border-radius:10px;padding:6px 10px;font-size:13px}.flow i{color:var(--mut);font-style:normal}
+pre{background:#08081a;border:1px solid #22224a;border-radius:10px;padding:12px;overflow:auto;font-size:12px;color:#cdd6ff}
+footer{max-width:1060px;margin:40px auto 0;padding:24px 16px 60px;color:var(--mut);border-top:1px solid var(--ln);font-size:12px}
+@media(max-width:820px){.g3,.g4{grid-template-columns:1fr 1fr}.g2{grid-template-columns:1fr}.hero h1{font-size:27px}}@media(max-width:520px){.g3,.g4{grid-template-columns:1fr}}
+</style></head><body>
+<nav class="top"><b>iFiNeX</b><a href="#try">Try it</a><a href="#how">How the demo works</a><a href="#modules">Modules</a><a href="#roles">Roles</a><a href="#scenarios">Walkthroughs</a><a href="#guide">Every option</a><a href="#db">Database</a><a href="#flows">Flows</a><a href="#own">Run it yourself</a><a href="#limits">Honest limits</a></nav>
+
+<section class="hero" id="try"><h1>Money tracking for people who share expenses.<br>Try it right now.</h1>
+<p class="lead">iFiNeX is a self-hosted web &amp; Android app: bills and cards, who-owes-whom, expense trackers, budgets, instalment plans and Squad Split — on <b>your own</b> Supabase database. This page lets you use the real app, with fake people and fake data, and explains every option and function.</p>
+<div class="grid g3" style="max-width:760px;margin:0 auto">
+ <a class="opt" href="play.html?device=web"><div class="ic">🖥️</div><h3>Website</h3><p>Full web app on a desktop screen. You are <b>Alex</b>, the admin.</p><span class="go">Open website demo →</span></a>
+ <a class="opt" href="play.html?device=mobile"><div class="ic">📱</div><h3>Mobile app</h3><p>The Android app experience in a phone frame. You are <b>Priya</b>, a member.</p><span class="go">Open mobile demo →</span></a>
+ <a class="opt" href="standalone.html"><div class="ic">☁️</div><h3>Standalone + Google backup</h3><p>No server. Sign in with Google, nightly 12:00 AM backup, restore on a new phone — simulated Google.</p><span class="go">Open →</span></a>
+</div>
+<a class="both" href="both.html">↔ Prefer both at once? <b>Website + phone side by side</b>, with a realtime feed</a>
+<div class="grid g4" style="max-width:760px;margin:26px auto 0"><div class="stat"><b id="st1">–</b><span>documented options &amp; functions</span></div><div class="stat"><b>18</b><span>guided walkthroughs</span></div><div class="stat"><b id="st2">–</b><span>database tables explained</span></div><div class="stat"><b>0</b><span>records leave your browser</span></div></div></section>
+
+<section id="how"><h2>How this demo works</h2><p class="lead">It is the <b>real iFiNeX website code</b>, unmodified, running in an iframe. Only one file is swapped: the database library.</p>
+<div class="grid g3">
+<div class="card"><h3>🧩 A fake database in your browser</h3><p>Instead of talking to Supabase, the app talks to a small stand-in that keeps tables in memory (people, cards, expenses, squads…). Reload the page and everything resets.</p></div>
+<div class="card"><h3>👥 Three fictional people</h3><p><b>Alex</b> (admin), <b>Priya</b> (member), <b>Sam</b> (Alex’s delegate). Switch with the top bar — each is a separate screen, sharing one database, so you can watch realtime alerts cross between them.</p></div>
+<div class="card"><h3>🔍 Request Inspector</h3><p>Open the <b>Inspector</b> tab in the demo to see every database call the app makes — table, filter, payload — plus a plain-English note on why the database allows it.</p></div></div>
+<p class="note" style="margin-top:14px"><b>Privacy:</b> nothing you type is sent to any server or saved. This demo shares a web address with the project site, but uses a fake login key and fake settings, so it cannot touch real data.</p></section>
+
+<section id="modules"><h2>What is inside</h2><p class="lead">Seven tools in one app, all behind one email sign-in.</p><div class="grid g4" id="modgrid"></div></section>
+
+<section id="roles"><h2>Who can do what</h2><p class="lead">Rules are enforced by the database (row-level security), not just hidden buttons.</p>
+<div class="tw"><table><tr><th>Ability</th><th>Member (Priya)</th><th>Admin (Alex)</th><th>Admin’s delegate (Sam)</th></tr>
+<tr><td>Own cards, spend, trackers, budget, plans</td><td>✅</td><td>✅</td><td>✅ (own) + ✅ on Alex’s account when switched</td></tr>
+<tr><td>Add / delete “owed” entries for others</td><td>—</td><td>✅</td><td>✅ (because the account is an admin’s)</td></tr>
+<tr><td>Delete any entry</td><td>Only own ledger lines, with a reason</td><td>✅ with a reason (audited)</td><td>✅ with a reason (audited)</td></tr>
+<tr><td>Add users, set delegates, create squads</td><td>—</td><td>✅</td><td>—</td></tr>
+<tr><td>See another person’s cards / trackers</td><td>Only if shared</td><td>Only if shared</td><td>Only the account delegated</td></tr>
+<tr><td>Connect Google Drive backup</td><td>✅ (own)</td><td>✅ (own)</td><td>✅ (own)</td></tr></table></div></section>
+
+<section id="scenarios"><h2>Guided walkthroughs</h2><p class="lead">Each opens the app on the right screen, for the right person, and tells you what to try. Pick a device in the demo toolbar at any time.</p><div class="grid g3" id="scgrid"></div></section>
+
+<section id="guide"><h2>Every option and function</h2><p class="lead">A searchable guide written from the app’s source code. Each entry says what it does, how to use it, who can, which tables it touches and whether you can try it in this demo.</p>
+<input class="q" id="q" type="search" placeholder="Search — e.g. “delete reason”, “backup”, “card due”, “squad”…" aria-label="Search features">
+<div class="chips" id="modchips"></div><div class="chips" id="lvlchips"></div><p class="lead" id="gcount"></p><div id="glist"></div></section>
+
+<section id="db"><h2>The database, explained</h2><p class="lead"><span id="dbn">34</span> tables. Here is what each holds, who may read or write it, and which screen fills it.</p>
+<input class="q" id="dq" type="search" placeholder="Filter tables…" aria-label="Filter tables"><div class="tw" style="margin-top:10px"><table id="dbt"></table></div>
+<h3 style="margin:24px 0 8px">Server functions &amp; the Edge function</h3><div class="tw"><table id="fnt"></table></div></section>
+
+<section id="flows"><h2>Key flows</h2><p class="lead">How the pieces talk to each other.</p>
+<div class="grid g2"><div class="card"><h3>🔐 Sign-in</h3><div class="flow"><span>Email</span><i>→</i><span>admin must have added it (app_users)</span><i>→</i><span>6-digit code by email</span><i>→</i><span>Supabase session</span><i>→</i><span>Hub</span></div><p>No passwords. If the email was not added you see “Not added yet — ask your admin”.</p></div>
+<div class="card"><h3>⚡ Realtime alerts</h3><div class="flow"><span>Alex saves</span><i>→</i><span>database trigger inserts bill_notifications</span><i>→</i><span>Realtime filter recipient_email = Priya</span><i>→</i><span>🔔 lights up</span></div><p>No refresh needed. Try “Admin tools” in the walkthroughs.</p></div>
+<div class="card"><h3>🗑️ Delete with a reason</h3><div class="flow"><span>Tap delete</span><i>→</i><span>reason required</span><i>→</i><span>delete_*_entry()</span><i>→</i><span>archive + notify</span></div><p>Nothing disappears silently; admins can read the history.</p></div>
+<div class="card"><h3>💾 Backup &amp; restore</h3><div class="flow"><span>Backup file (.json)</span><i>→</i><span>validate</span><i>→</i><span>ifx_restore_rows ×200</span><i>→</i><span>only missing rows added</span></div><p>Restore never overwrites or deletes.</p></div>
+<div class="card"><h3>☁️ Google Drive</h3><div class="flow"><span>Connect</span><i>→</i><span>Google page</span><i>→</i><span>Edge function stores token</span><i>→</i><span>pg_cron runs schedule</span><i>→</i><span>file in hidden app folder</span></div><p>The app can only see its own folder, never the rest of your Drive.</p></div>
+<div class="card"><h3>🏠 Standalone mode</h3><p>No server at all: everything stays on the device (and in backup files). Same screens; no sharing, no realtime. The Android app can run this way or connect to your Supabase project.</p></div></div></section>
+
+<section id="own"><h2>Run it yourself</h2><p class="lead">The demo is only a showcase. The real thing runs on your own free accounts.</p>
+<div class="grid g3"><div class="card"><h3>1 · Supabase</h3><p>Create a free project, run <code>supabase/schema.sql</code>, add your first admin in <code>app_users</code>.</p></div><div class="card"><h3>2 · Website</h3><p>Put the <code>web/</code> folder on GitHub Pages (or any static host) and put your project URL and public key in <code>ifinex-config.json</code>.</p></div><div class="card"><h3>3 · Android</h3><p>Open <code>mobile/</code> in Android Studio, build the APK. Never put the service-role key in the web or app.</p></div></div>
+<p class="lead" style="margin-top:12px">Full step-by-step guides are in the repository <code>docs/</code> folder.</p></section>
+
+<section id="limits"><h2>Honest limits of this demo</h2><div class="note"><ul style="margin:0;padding-left:18px">
+<li><b>Fake backend:</b> a stand-in reproduces what the database does for the screens (filters, realtime, notifications, delete-with-reason, squad functions, restore). It is not the real PostgreSQL, so real policy edge cases are not tested here.</li>
+<li><b>Email codes, push alerts, scheduled jobs:</b> not run. Sign-in is pre-done; push needs real keys; Drive schedules (pg_cron) only “run” when you press Back up.</li>
+<li><b>Google Drive:</b> the Google page is a clearly labelled simulation; the backup files live in memory.</li>
+<li><b>Squad e-mail report</b> needs a server function (<code>send-report</code>) that is not deployed in the standard project — it shows an error here.</li>
+<li><b>Mobile app:</b> it is the same web code inside an Android WebView; the demo shows it in a phone frame. Native extras (push registration, file save dialogs, in-app update) cannot run in a browser.</li>
+<li><b>Data resets</b> every time you reload.</li></ul></div></section>
+
+<footer>iFiNeX web v14.4 · app v7.4.0 · demo v14.5 — fictional people and data. <a href="play.html">Open the demo</a> · <a href="#guide">Search the guide</a></footer>
+
+<script src="scenarios.js"></script><script src="features-a.js"></script><script src="features-b.js"></script><script src="features-c.js"></script><script src="dbdata.js"></script>
+<script>
+(function(){
+var $=function(i){return document.getElementById(i)},esc=function(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})};
+var F=window.IFX_FEATURES,LV={full:['ok','✅ Try it live'],partial:['sim','🟡 Simulated'],described:['dsc','📖 Explained only']};
+$('st1').textContent=F.length;$('st2').textContent=IFX_DB.length;$('dbn').textContent=IFX_DB.length;
+var MOD=[['Bill Tracker','🧾','Spend, cards, who-owes-whom, party ledger'],['Expense Tracker','🪙','Period, trip & event trackers'],['Budget & Salary Planner','📈','Income, buckets, goals'],['Squad Split','👥','Multi-squad equal splits & settle-up'],['EPP & Gold Plans','📅','Instalments & schedules'],['Settings','⚙️','Themes, alerts, backup, Drive, import/export'],['Admin','🛡️','Users, delegates, audit'],['Modes & devices','📱','Server, standalone, Android']];
+$('modgrid').innerHTML=MOD.map(function(m){var n=F.filter(function(f){return f.m===m[0]}).length;return'<a class="card" style="text-decoration:none" href="#guide" data-m="'+esc(m[0])+'"><div style="font-size:28px">'+m[1]+'</div><h3>'+esc(m[0])+'</h3><p>'+esc(m[2])+'</p><span class="pill">'+n+' documented</span></a>'}).join('');
+$('scgrid').innerHTML=IFX_SCENARIOS.map(function(s){return'<a class="scn" href="play.html?scenario='+s.id+'"><span class="i">'+s.icon+'</span><span><b>'+esc(s.title)+'</b><span>'+esc(s.blurb)+'</span></span></a>'}).join('');
+var st={q:'',m:'',l:''};
+function chips(){var mods=[''].concat(Array.from(new Set(F.map(function(f){return f.m}))));
+ $('modchips').innerHTML=mods.map(function(m){return'<button class="chip" data-m="'+esc(m)+'" aria-pressed="'+(st.m===m)+'">'+esc(m||'All modules')+'</button>'}).join('');
+ $('lvlchips').innerHTML=[['','Any level'],['full','✅ Try it live'],['partial','🟡 Simulated'],['described','📖 Explained only']].map(function(l){return'<button class="chip" data-l="'+l[0]+'" aria-pressed="'+(st.l===l[0])+'">'+l[1]+'</button>'}).join('')}
+function draw(){var q=st.q.toLowerCase(),out=F.filter(function(f){return(!st.m||f.m===st.m)&&(!st.l||f.demo===st.l)&&(!q||(f.m+' '+f.a+' '+f.t+' '+f.s+' '+f.h+' '+f.d.join(' ')+' '+f.db.join(' ')+' '+f.code.join(' ')).toLowerCase().indexOf(q)>=0)});
+ $('gcount').textContent=out.length+' of '+F.length+' entries';
+ $('glist').innerHTML=out.map(function(f){var l=LV[f.demo]||LV.full;
+  return'<details class="f"><summary><span class="pill">'+esc(f.m)+' › '+esc(f.a)+'</span><b>'+esc(f.t)+'</b><span class="pill '+l[0]+'">'+l[1]+'</span></summary><div class="body"><p>'+esc(f.s)+'</p><h4>How to use it</h4><p>'+esc(f.h)+'</p><h4>Who can</h4><p>'+esc(f.w)+'</p>'+(f.d.length?'<h4>Details</h4><ul>'+f.d.map(function(x){return'<li>'+esc(x)+'</li>'}).join('')+'</ul>':'')+(f.db.length?'<h4>Database</h4><p>'+f.db.map(function(x){return'<code>'+esc(x)+'</code> '}).join('')+'</p>':'')+(f.code.length?'<h4>Code (function names)</h4><p>'+f.code.map(function(x){return'<code>'+esc(x)+'</code> '}).join('')+'</p>':'')+(f.sc?'<p style="margin-top:12px"><a class="go" href="play.html?scenario='+esc(f.sc)+'">▶ Try this in the demo</a></p>':'')+'</div></details>'}).join('')||'<p class="lead">Nothing matches — try fewer words.</p>'}
+$('q').oninput=function(){st.q=this.value;draw()};
+document.addEventListener('click',function(e){var c=e.target.closest('.chip');if(c){if('m' in c.dataset)st.m=c.dataset.m;if('l' in c.dataset)st.l=c.dataset.l;chips();draw();return}var a=e.target.closest('#modgrid a');if(a){st.m=a.dataset.m;chips();draw()}});
+chips();draw();
+function tbl(el,head,rows){el.innerHTML='<tr>'+head.map(function(h){return'<th>'+h+'</th>'}).join('')+'</tr>'+rows.map(function(r){return'<tr>'+r.map(function(c,i){return'<td>'+(i===1?'<code>'+esc(c)+'</code>':esc(c))+'</td>'}).join('')+'</tr>'}).join('')}
+function dbdraw(){var q=$('dq').value.toLowerCase();tbl($('dbt'),['Area','Table','Holds','Main columns','Who can read / write','Filled by'],IFX_DB.filter(function(r){return!q||r.join(' ').toLowerCase().indexOf(q)>=0}))}
+$('dq').oninput=dbdraw;dbdraw();
+$('fnt').innerHTML='<tr><th>Function</th><th>What it does</th></tr>'+IFX_FUNCS.map(function(r){return'<tr><td><code>'+esc(r[0])+'</code></td><td>'+esc(r[1])+'</td></tr>'}).join('');
+if(location.hash==='#guide'){}
+})();
+</script></body></html>

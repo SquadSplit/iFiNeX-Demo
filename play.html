@@ -1,0 +1,102 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>iFiNeX Live Demo — guided</title><link rel="stylesheet" href="shared.css">
+<style>
+body{display:flex;flex-direction:column;height:100vh}
+main{flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1fr) 400px;gap:12px;padding:12px}
+#stage{min-height:0;display:flex;align-items:stretch;justify-content:center}
+#box{flex:1;min-height:0;display:flex;align-items:center;justify-content:center}
+#box.web iframe{width:100%;height:100%;border-radius:10px;border:1px solid var(--ln)}
+.phone{background:#000;border-radius:38px;padding:12px;border:2px solid #34345e;box-shadow:0 20px 60px #0008}
+.phone iframe{border-radius:28px;width:390px;height:min(800px,calc(100vh - 150px));min-height:480px}
+aside{min-height:0;display:flex;flex-direction:column;background:var(--card);border:1px solid var(--ln);border-radius:14px;overflow:hidden}
+.tabs{display:flex;border-bottom:1px solid var(--ln)}.tabs button{flex:1;background:none;border:0;color:var(--mut);padding:10px;cursor:pointer;font:inherit;font-weight:600}
+.tabs button[aria-selected=true]{color:var(--tx);box-shadow:inset 0 -2px var(--ac)}
+.pane{flex:1;min-height:0;overflow:auto;padding:12px;display:none}.pane.on{display:block}
+.sc{display:flex;gap:10px;align-items:flex-start;width:100%;text-align:left;background:#0f0f22;border:1px solid var(--ln);color:var(--tx);border-radius:12px;padding:10px;margin:0 0 8px;cursor:pointer;font:inherit}
+.sc:hover,.sc:focus-visible{border-color:var(--ac);outline:0}.sc .i{font-size:22px}.sc b{display:block}.sc span{color:var(--mut);font-size:12px}
+.step{background:#0f0f22;border:1px solid var(--ln);border-radius:12px;padding:12px;margin-bottom:10px}
+.step h3{margin:0 0 6px;font-size:15px}.step p{margin:0 0 8px;color:#c9d0f5}
+.badge{display:inline-block;font-size:11px;border:1px solid var(--ln);border-radius:20px;padding:1px 8px;color:var(--mut);margin-right:4px}
+.btn{background:var(--ac);color:#fff;border:0;border-radius:9px;padding:8px 12px;cursor:pointer;font:inherit;font-weight:600}.btn.g{background:#22224a}.btn:disabled{opacity:.4;cursor:default}
+.nav{display:flex;gap:8px;justify-content:space-between;margin-top:8px}.dots{display:flex;gap:4px;margin:0 0 10px}.dots i{height:5px;flex:1;background:#26264a;border-radius:3px}.dots i.on{background:var(--ac)}
+.call{border-bottom:1px solid #22224a;padding:7px 0;font-size:12px}.call .h{display:flex;gap:6px;align-items:baseline;flex-wrap:wrap}
+.op{font:700 10px ui-monospace,monospace;padding:1px 6px;border-radius:5px;background:#26264a}.op.insert,.op.upsert{background:#1d5a34}.op.update{background:#6a5200}.op.delete{background:#7a2323}.op.rpc,.op.edge{background:#4a2a7a}.op.select{background:#1e3a6a}.op.rt{background:#115a60}
+pre{margin:6px 0 0;background:#08081a;border:1px solid #22224a;border-radius:8px;padding:8px;overflow:auto;max-height:170px;font:11px ui-monospace,monospace;color:#cdd6ff;white-space:pre-wrap;word-break:break-word}
+.why{color:var(--mut);margin:4px 0 0}.tools{display:flex;gap:8px;align-items:center;margin-bottom:8px;flex-wrap:wrap}
+label.chk{color:var(--mut);font-size:12px}.hint{color:var(--mut);font-size:12px}
+@media(max-width:1000px){body{height:auto}main{grid-template-columns:1fr}#stage{height:78vh}aside{height:70vh}.phone iframe{height:70vh}}
+</style></head><body>
+<div class="bar"><a class="back" href="index.html">← Back to overview</a><b id="ttl">iFiNeX demo</b><span class="sp"></span>
+ <span class="seg" id="dev" role="group" aria-label="Device"><button data-v="web">🖥️ Website</button><button data-v="mobile">📱 Mobile app</button></span>
+ <span class="seg" id="mod" role="group" aria-label="Module"><button data-v="bill-tracker.html">Bill Tracker &amp; more</button><button data-v="squad.html">Squad Split</button></span>
+ <span class="seg" id="usr" role="group" aria-label="User"><button data-v="alex">Alex · admin</button><button data-v="priya">Priya · member</button><button data-v="sam">Sam · Alex’s delegate</button></span>
+ <span class="seg"><button id="rst" title="Reset all fake data">↺ Reset</button></span></div>
+<main><section id="stage"><div id="box"></div></section>
+<aside><div class="tabs" role="tablist"><button role="tab" data-t="guide" aria-selected="true">🧭 Guide</button><button role="tab" data-t="insp" aria-selected="false">🔍 Inspector <span id="cnt" class="badge">0</span></button></div>
+ <div class="pane on" id="p-guide"></div>
+ <div class="pane" id="p-insp"><div class="tools"><label class="chk"><input type="checkbox" id="fw" checked> writes &amp; function calls only</label><label class="chk"><input type="checkbox" id="fr2"> realtime events</label><button class="btn g" id="clr">Clear</button></div>
+  <p class="hint">This is what the real app sends to the database. Every row shows the table, the filter, the payload — and why the database allows or limits it.</p><div id="calls"></div></div></aside></main>
+<script src="scenarios.js"></script>
+<script>
+(function(){
+  var Q=new URLSearchParams(location.search),USERS={alex:['alex@demo.test','Alex · admin'],priya:['priya@demo.test','Priya · member'],sam:['sam@demo.test','Sam · delegate']};
+  var cur={dev:Q.get('device')==='mobile'?'mobile':'web',user:USERS[Q.get('user')]?Q.get('user'):(Q.get('device')==='mobile'?'priya':'alex'),page:Q.get('module')==='squad'?'squad.html':'bill-tracker.html'};
+  var box=document.getElementById('box'),fr=null,sc=null,si=0,calls=[];
+  var $=function(i){return document.getElementById(i)};
+  function seg(id,v){document.querySelectorAll('#'+id+' button').forEach(function(b){b.setAttribute('aria-pressed',b.dataset.v===v?'true':'false')})}
+  function esc(s){return String(s).replace(/[&<>]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;'}[c]})}
+  function layout(){box.className=cur.dev;seg('dev',cur.dev);seg('mod',cur.page);seg('usr',cur.user);$('ttl').textContent=cur.dev==='web'?'🖥️ Website demo':'📱 Mobile app demo'}
+  function load(cb){
+    box.innerHTML='';fr=document.createElement('iframe');fr.name='ifx-demo:'+USERS[cur.user][0];fr.title='iFiNeX '+cur.dev+' demo';
+    fr.src='app/'+cur.page+(cur.page==='squad.html'?'?as='+encodeURIComponent(USERS[cur.user][0]):'');
+    if(cur.dev==='mobile'){var p=document.createElement('div');p.className='phone';p.appendChild(fr);box.appendChild(p)}else box.appendChild(fr);
+    layout();ready(cb);
+  }
+  function ready(cb){var n=0,f=fr;(function w(){
+    if(f!==fr)return;var ok=false;try{var d=f.contentDocument,a=d&&d.getElementById('screen-app');
+      ok=cur.page==='squad.html'?(d&&d.readyState==='complete'&&d.body&&d.body.innerText.length>40):(a&&a.classList.contains('active')&&f.contentWindow.eval('typeof managing!=="undefined"&&!!managing&&typeof renderHome==="function"'));}catch(e){}
+    if(ok||++n>40){setTimeout(function(){cb&&cb()},350);return}setTimeout(w,250)})()}
+  function run(js){if(!js)return;try{fr.contentWindow.eval(js)}catch(e){console.warn('step go failed',e)}}
+  function ctx(){var w=fr.contentWindow;return{win:w,sb:function(){return w.supabase.createClient()},say:function(m){try{(w.toast||w.showToast)(m)}catch(e){alert(m)}},
+    refresh:function(){try{return w.eval("(async function(){if(typeof loadMyData==='function'){await loadMyData();typeof renderHome==='function'&&renderHome();typeof renderPlans==='function'&&renderPlans();typeof loadEt==='function'&&loadEt().then(function(){typeof renderEt==='function'&&renderEt()})}else if(typeof loadAllData==='function'){await loadAllData();typeof renderSquad==='function'&&renderSquad();}})()")}catch(e){}}}}
+  /* ---- guide ---- */
+  function list(){var h='<p class="hint" style="margin-top:0">Pick a walkthrough. Each step opens the right screen for the right person and tells you what to look at. You can always click around freely.</p>';
+    IFX_SCENARIOS.forEach(function(s){h+='<button class="sc" data-id="'+s.id+'"><span class="i">'+s.icon+'</span><span><b>'+esc(s.title)+'</b><span>'+esc(s.blurb)+' · '+s.steps.length+' steps</span></span></button>'});
+    $('p-guide').innerHTML=h;$('p-guide').querySelectorAll('.sc').forEach(function(b){b.onclick=function(){start(b.dataset.id)}})}
+  function start(id,i){sc=IFX_SCENARIOS.filter(function(s){return s.id===id})[0];if(!sc)return list();show(i||0)}
+  function show(i){si=i;var s=sc.steps[i];
+    var h='<button class="btn g" id="all">← All walkthroughs</button><h2 style="margin:12px 0 6px;font-size:16px">'+sc.icon+' '+esc(sc.title)+'</h2><div class="dots">';
+    sc.steps.forEach(function(x,k){h+='<i class="'+(k<=i?'on':'')+'"></i>'});
+    h+='</div><div class="step"><span class="badge">Step '+(i+1)+' / '+sc.steps.length+'</span><span class="badge">as '+USERS[s.u][1]+'</span><h3>'+esc(s.title)+'</h3><p>'+esc(s.text)+'</p>';
+    if(s.act)h+='<button class="btn" id="act">▶ '+esc(s.act.label)+'</button> <span class="hint" id="actm"></span>';
+    h+='</div><div class="nav"><button class="btn g" id="prv"'+(i?'':' disabled')+'>‹ Back</button><button class="btn" id="nxt">'+(i<sc.steps.length-1?'Next ›':'Done ✓')+'</button></div>';
+    $('p-guide').innerHTML=h;
+    $('all').onclick=function(){sc=null;list()};$('prv').onclick=function(){show(si-1)};$('nxt').onclick=function(){si<sc.steps.length-1?show(si+1):(sc=null,list())};
+    if(s.act)$('act').onclick=function(){var b=this;b.disabled=true;Promise.resolve(s.act.run(ctx())).then(function(){return ctx().refresh()}).then(function(){$('actm').textContent='Done — see the Inspector tab.'}).catch(function(e){$('actm').textContent='Failed: '+e});};
+    var need=(s.u!==cur.user)||(s.p!==cur.page);cur.user=s.u;cur.page=s.p;
+    if(need||!fr)load(function(){run(s.go)});else{layout();run(s.go)}}
+  /* ---- inspector ---- */
+  var WHY={bill_expenses:'RLS: you can read/write rows where user_email is YOUR email (admin and admin-delegates also manage others).',bill_owed:'RLS: the owner reads their own; only an admin or admin’s delegate may insert. Trigger notifies the person.',bill_settlements:'RLS: owner/admin. A trigger notifies the admins.',bill_payee_entries:'RLS: both sides of a ledger can read it; a trigger notifies the other side.',bill_payees:'RLS: owner only (plus the named party can read).',bill_cards:'RLS: owner, or someone the card is shared with.',bill_plans:'RLS: owner/delegate.',bill_plan_payments:'RLS: follows the plan owner.',bill_notifications:'RLS: you only receive rows where recipient_email is you. Realtime filter: recipient_email=eq.<you>.',et_entries:'RLS: tracker owner and its participants.',et_trackers:'RLS: owner and participants.',expenses:'RLS: squad members of that squad_id (v9.3 scopes by squad).',squads:'RLS: members read; admin writes (via squad_save).',squad_members:'Written only through squad_save().',members_config:'People directory used by Squad Split.',app_users:'Who may sign in. Reading is limited; writing is admin only.',bp_income:'RLS: owner.',bp_items:'RLS: owner.',bp_goals:'RLS: owner.'};
+  function why(c){if(c.rpc)return'Postgres function (SECURITY DEFINER) — it checks who you are, does the change, writes the audit row and sends notifications in one transaction.';if(c.edge)return'Supabase Edge Function — runs on the server with secrets the browser never sees (Google tokens).';var t=String(c.table).replace(/ .*/,'');return WHY[t]||(c.op==='select'?'Read through row-level security: you only get rows the policy allows.':'Row-level security applies.')}
+  function addCall(c,rt){calls.push({c:c,rt:rt});if(!rt)$('cnt').textContent=calls.filter(function(x){return!x.rt}).length;drawCalls()}
+  function drawCalls(){var w=$('fw').checked,r=$('fr2').checked,h='';
+    calls.slice(-120).reverse().forEach(function(x){var c=x.c;if(x.rt){if(!r)return}else if(w&&c.op==='select')return;
+      var time=new Date(c.t||Date.now()).toLocaleTimeString(),who=String(c.by||'').split('@')[0];
+      if(x.rt){h+='<div class="call"><div class="h"><span class="op rt">REALTIME</span><b>'+esc(c.ev)+' '+esc(c.table)+'</b><span class="hint">'+time+' · caused by '+esc(who)+'</span></div></div>';return}
+      var body={};if(c.filters&&c.filters.length)body.where=c.filters;if(c.payload!==undefined)body.payload=c.payload;if(c.onConflict)body.onConflict=c.onConflict;
+      h+='<div class="call"><div class="h"><span class="op '+c.op+'">'+c.op.toUpperCase()+'</span><b>'+esc(c.table)+'</b><span class="hint">'+time+' · '+esc(who)+(c.rows!=null?' · '+c.rows+' row'+(c.rows==1?'':'s'):'')+'</span></div><div class="why">'+esc(why(c))+'</div>'+(Object.keys(body).length?'<pre>'+esc(JSON.stringify(body,null,2))+'</pre>':'')+'</div>'});
+    $('calls').innerHTML=h||'<p class="hint">Nothing yet — do something in the app (or run a walkthrough action).</p>'}
+  window.addEventListener('ifx-demo-call',function(e){addCall(e.detail)});
+  window.addEventListener('ifx-demo-event',function(e){var d=e.detail;addCall({ev:d.ev,table:d.table,by:d.by,t:Date.now()},true)});
+  $('fw').onchange=$('fr2').onchange=drawCalls;$('clr').onclick=function(){calls=[];$('cnt').textContent='0';drawCalls()};
+  document.querySelectorAll('.tabs button').forEach(function(b){b.onclick=function(){document.querySelectorAll('.tabs button').forEach(function(x){x.setAttribute('aria-selected',x===b)});$('p-guide').classList.toggle('on',b.dataset.t==='guide');$('p-insp').classList.toggle('on',b.dataset.t==='insp')}});
+  /* ---- toolbar ---- */
+  document.querySelectorAll('#dev button').forEach(function(b){b.onclick=function(){cur.dev=b.dataset.v;load()}});
+  document.querySelectorAll('#mod button').forEach(function(b){b.onclick=function(){cur.page=b.dataset.v;load()}});
+  document.querySelectorAll('#usr button').forEach(function(b){b.onclick=function(){cur.user=b.dataset.v;load()}});
+  $('rst').onclick=function(){location.reload()};
+  window.IFX_PLAY={cur:cur,start:start,frame:function(){return fr},calls:function(){return calls}};
+  drawCalls();list();
+  if(Q.get('scenario'))start(Q.get('scenario'),+Q.get('step')||0);else load();
+})();
+</script></body></html>

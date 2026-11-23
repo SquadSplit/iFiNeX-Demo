@@ -1,0 +1,49 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex">
+<title>iFiNeX Demo — Standalone + Google backup</title><link rel="stylesheet" href="shared.css">
+<style>
+body{display:flex;flex-direction:column;min-height:100vh}
+main{flex:1;display:grid;grid-template-columns:minmax(0,1fr) 420px;gap:12px;padding:12px}
+#stage{display:flex;justify-content:center;align-items:flex-start}
+.phone{background:#000;border-radius:38px;padding:12px;border:2px solid #34345e;box-shadow:0 20px 60px #0008}
+.phone iframe{display:block;border:0;border-radius:28px;width:390px;height:min(800px,calc(100vh - 110px));min-height:480px;background:#0b0b1c}
+aside{background:var(--card);border:1px solid var(--ln);border-radius:14px;padding:12px;overflow:auto;max-height:calc(100vh - 80px)}
+h2{font-size:16px;margin:0 0 6px}h3{font-size:13px;margin:14px 0 6px;color:#c9d0f5}p{margin:0 0 8px;color:#c9d0f5;font-size:13px}
+.btn{background:var(--ac);color:#fff;border:0;border-radius:9px;padding:9px 12px;cursor:pointer;font:inherit;font-weight:600;margin:0 6px 6px 0}.btn.g{background:#22224a}
+.step{background:#0f0f22;border:1px solid var(--ln);border-radius:12px;padding:10px;margin-bottom:8px;font-size:13px}.step b{color:#fff}
+.drive{background:#08081a;border:1px solid #22224a;border-radius:10px;padding:8px;font:12px ui-monospace,monospace;color:#cdd6ff;min-height:46px}
+.drive div{padding:2px 0;border-bottom:1px solid #16163a}.log{max-height:150px;overflow:auto;white-space:pre-wrap;color:#9aa3c7}
+.sim{background:#3a2e00;border:1px solid #6a5200;border-radius:8px;padding:8px;font-size:12px;color:#ffe9a6;margin-bottom:10px}
+@media(max-width:1000px){main{grid-template-columns:1fr}aside{max-height:none}}
+</style></head><body>
+<div class="bar"><a class="back" href="index.html">← Back to overview</a><b>📱 Standalone app + Google backup</b><span class="sp"></span></div>
+<main><section id="stage"><div class="phone"><iframe id="fr" title="iFiNeX standalone app"></iframe></div></section>
+<aside>
+<div class="sim"><b>Simulated Google.</b> The app code is the real one (data stays on the phone; Google sign-in; nightly backup; restore). Fake: Google's page (the code is approved by itself after a few seconds), the Drive list below (it lives in this page, so it survives a “new phone”) and Android's midnight timer (use the 🌙 button).</div>
+<h2>Try it — 6 steps</h2>
+<div class="step"><b>1.</b> First start shows “Welcome”. Press <b>Continue with Google</b>. Wait for the code to be accepted (about 8 s). The account has no backup yet, so press <b>Start fresh</b> and type a name.</div>
+<div class="step"><b>2.</b> Add some data: open <b>Bill Tracker → ➕ Add</b> and save two or three expenses.</div>
+<div class="step"><b>3.</b> Press <b>🌙 Simulate 12:00 AM</b> below. The nightly backup runs: a file appears in “Your Google Drive”. Press it again: nothing new — data did not change.</div>
+<div class="step"><b>4.</b> Press <b>🗑️ New phone (reinstall)</b>. The phone is wiped; Google's Drive is kept.</div>
+<div class="step"><b>5.</b> On the welcome screen press <b>Continue with Google</b>. It finds <b>Latest backup found</b> with its date and number of records. Press <b>Restore this latest backup</b> — your expenses are back. (Or choose <b>Start fresh</b>.)</div>
+<div class="step"><b>6.</b> Any time later: <b>☰ → Backup &amp; Restore → Restore my latest Google backup</b>.</div>
+<h3>Demo controls</h3>
+<button class="btn" id="mid">🌙 Simulate 12:00 AM</button><button class="btn g" id="nw">🗑️ New phone (reinstall)</button><button class="btn g" id="all">↺ Reset everything</button>
+<h3>Your Google Drive (hidden app folder)</h3><div class="drive" id="dv">empty</div>
+<h3>What Google/Drive saw</h3><div class="drive log" id="lg">–</div>
+</aside></main>
+<script>
+(function(){
+  var fr=document.getElementById('fr'),APP='app-standalone/bill-tracker.html';
+  var D=window.__SA_DRIVE=window.__SA_DRIVE||{files:[],n:0,polls:0,log:[]};
+  function load(){fr.src=APP+'?t='+Date.now()}
+  function paint(){var d=document.getElementById('dv');d.innerHTML=D.files.length?D.files.map(function(f){return'<div>☁️ '+f.name+' · '+Math.round(f.size/102.4)/10+' KB</div>'}).join(''):'empty — no backup yet';document.getElementById('lg').textContent=D.log.join('\n')||'–'}
+  function wipeDevice(){return new Promise(function(res){fr.src='about:blank';setTimeout(function(){
+    try{Object.keys(localStorage).filter(function(k){return /^ifx_/.test(k)}).forEach(function(k){localStorage.removeItem(k)})}catch(e){}
+    var q=indexedDB.deleteDatabase('ifinex-standalone');q.onsuccess=q.onerror=q.onblocked=function(){res()}},300)})}
+  document.getElementById('mid').onclick=function(){try{var w=fr.contentWindow;w.localStorage.removeItem('ifx_gd_day');w.ifxGDrive.dailyRun();setTimeout(paint,1500)}catch(e){alert('Open the app first and connect Google (step 1).')}};
+  document.getElementById('nw').onclick=function(){wipeDevice().then(load)};
+  document.getElementById('all').onclick=function(){D.files=[];D.log=[];D.n=0;wipeDevice().then(load)};
+  setInterval(paint,1000);paint();
+  wipeDevice().then(load);
+})();
+</script></body></html>
